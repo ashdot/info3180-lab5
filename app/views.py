@@ -73,10 +73,7 @@ def movies():
 
         return jsonify(movie_added)
 
-    return jsonify({
-        "message": "Validation failed",
-        "errors": form.errors
-    }), 400
+    return jsonify({"errors": form_errors(form.errors)}), 400
 
 
 
