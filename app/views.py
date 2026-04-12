@@ -10,13 +10,20 @@ from app import app
 from werkzeug.utils import secure_filename
 from flask import render_template, request, jsonify, send_file
 
-from forms import MovieForm 
-from models import Movie 
+from .forms import MovieForm 
+
+
+from .models import Movie 
 
 from . import db 
 
 import os
 
+
+
+from flask_wtf.csrf import generate_csrf
+
+ 
 
 ###
 # Routing for your application.
@@ -36,19 +43,90 @@ JSON format similar to the example below:
 "description": "Summary of the movie".
 }"""
 
+# @app.route('/api/v1/movies', methods=["POST"])
+# def movies():
+
+#     form = MovieForm()
+
+#     if form.validate_on_submit():
+
+#         title = form.title.data 
+
+#         poster = form.poster.data 
+
+#         description = form.description.data 
+
+
+#         filename = secure_filename(poster.filename)
+
+#         upload_path = os.path.join(app.root_path, 'uploads', filename)
+#         poster.save(upload_path)
+
+#         movie = Movie(
+#             title=title,
+#             description=description,
+#             poster=filename
+#         )
+
+#         db.session.add(movie)
+#         db.session.commit()
+
+#         movie_added = {
+#             "message": "Movie Successfully added",
+#             "title": title,
+#             "poster": filename,
+#             "description": description
+#         }
+
+#         return jsonify(movie_added)
+
+#     return jsonify({"errors": form_errors(form.errors)}), 400
+
+# @app.route('/api/v1/movies', methods=["POST"])
+# def movies():
+
+#     form = MovieForm()
+
+#     title = request.form.get("title")
+#     description = request.form.get("description")
+#     poster = request.files.get("poster")
+
+#     if not title or not description or not poster:
+#         return jsonify({"error": "Missing fields"}), 400
+
+#     filename = secure_filename(poster.filename)
+
+#     upload_path = os.path.join(app.root_path, 'uploads', filename)
+#     poster.save(upload_path)
+
+#     movie = Movie(
+#         title=title,
+#         description=description,
+#         poster=filename
+#     )
+
+#     db.session.add(movie)
+#     db.session.commit()
+
+#     return jsonify({
+#         "message": "Movie Successfully added",
+#         "title": title,
+#         "poster": filename,
+#         "description": description
+#     }), 201
+
 @app.route('/api/v1/movies', methods=["POST"])
 def movies():
 
-    form = MovieForm()
+    try:
+        title = request.form.get("title")
+        description = request.form.get("description")
+        poster = request.files.get("poster")
 
-    if form.validate_on_submit():
-
-        title = form.title.data 
-
-        poster = form.poster.data 
-
-        description = form.description.data 
-
+        if not title or not description or not poster:
+            return jsonify({
+                "errors": "Missing title, description or poster"
+            }), 400
 
         filename = secure_filename(poster.filename)
 
@@ -64,20 +142,21 @@ def movies():
         db.session.add(movie)
         db.session.commit()
 
-        movie_added = {
+        return jsonify({
             "message": "Movie Successfully added",
             "title": title,
             "poster": filename,
             "description": description
-        }
+        }), 201
 
-        return jsonify(movie_added)
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": str(e)}), 500
+    
 
-    return jsonify({"errors": form_errors(form.errors)}), 400
-
-
-
-
+@app.route('/api/v1/csrf-token', methods=['GET'])
+def get_csrf():
+ return jsonify({'csrf_token': generate_csrf()}) 
 ###
 # The functions below should be applicable to all Flask apps.
 ###
