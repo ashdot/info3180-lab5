@@ -1,5 +1,9 @@
 <template>
   <div>
+    <p v-if="message" :class="status">
+    {{ message }}
+    </p>
+
     <h2>Upload Form</h2>
 
      <form id="movieForm" @submit.prevent="saveMovie" enctype="multipart/form-data">
@@ -46,7 +50,7 @@
 
     </form>
 
-    <p v-if="message">{{ message }}</p>
+   
 
   </div>
 </template>
@@ -60,6 +64,8 @@ const title = ref('')
 const description = ref('')
 const poster = ref(null)
 const message = ref('')
+
+const status = ref('success')
 
 const csrfToken = ref("")
 
@@ -93,29 +99,50 @@ function saveMovie() {
       "X-CSRFToken": csrfToken.value
     }
   })
-  .then(response => response.json())
-  .then(data => {
+    .then(response => {
+    if (!response.ok) {
+        return response.json().then(error => {
+        throw error
+        })
+    }
+    return response.json()
+    })
+    .then(data => {
     console.log(data)
 
+    status.value = "success"
     message.value = "Movie uploaded successfully!"
 
-    title.value = "" 
-    description.value = "" 
+    title.value = ""
+    description.value = ""
     poster.value = null
-
-  })
-  .catch(error => {
+    })
+    .catch(error => {
     console.log(error)
 
-    message.value = "Error uploading movie"
-  })
+    status.value = "error"
+
+    message.value = error.error || "Error uploading movie"
+    })
 }
 
 </script>
 
-<style>
+<style scoped>
 
+.success { 
+    border: 1px solid green;
+    background-color: lightgreen; 
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 10px;
 
-
-
+}
+.error { 
+    border: 1px solid red;
+    background-color: lightcoral; 
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 10px;
+    }
 </style>
