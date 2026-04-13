@@ -1,11 +1,14 @@
 <template>
-  <div>
+    <div class="container mt-4"> <!--Looks neater-->
+
+
+    <h2 class="mb-2">Upload Form</h2>
+
     <p v-if="message" :class="status">
     {{ message }}
     </p>
 
-    <h2>Upload Form</h2>
-
+    
      <form id="movieForm" @submit.prevent="saveMovie" enctype="multipart/form-data">
       
       <!-- Title -->
@@ -22,12 +25,12 @@
       <!-- Description -->
       <div class="form-group mb-3">
         <label for="description" class="form-label">Description</label>
-        <input 
-          type="text" 
-          name="description" 
-          class="form-control"
-          v-model="description"
-        />
+        <textarea
+            name="description"
+            class="form-control"
+            v-model="description"
+            rows="4"
+        ></textarea> <!--Fixed this to allow for bigger text box-->
       </div>
 
       <!-- Poster -->
@@ -50,9 +53,10 @@
 
     </form>
 
+    </div>
+
    
 
-  </div>
 </template>
 
 
