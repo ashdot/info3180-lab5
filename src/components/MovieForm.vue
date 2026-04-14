@@ -71,7 +71,7 @@ const message = ref('')
 
 const status = ref('success')
 
-const csrfToken = ref("")
+const csrf_token = ref("")
 
 
 function getCsrfToken() {
@@ -79,7 +79,7 @@ function getCsrfToken() {
     .then(response => response.json())
     .then(data => {
       console.log(data)
-      csrfToken.value = data.csrf_token
+      csrf_token.value = data.csrf_token
     })
 } 
 
@@ -100,7 +100,7 @@ function saveMovie() {
     method: "POST",
     body: form_data,
     headers: {
-      "X-CSRFToken": csrfToken.value
+      "X-CSRFToken": csrf_token.value
     }
   })
     .then(response => {
